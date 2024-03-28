@@ -10,13 +10,14 @@ def read_data(filepath):
     Returns:
         pd.DataFrame: The loaded data as a DataFrame.
     """
-    if filepath.endswith(".csv") or filepath.endswith(".txt"):
+    if filepath.endswith(".csv") or filepath.endswith(".txt"): # Read dataset if the end of the filepath is .csv or .txt
         try:
             data = pd.read_csv(filepath)
+            print('--> Opening', filepath)
         except:
-            raise Exception("File not found.")
+            raise Exception("File not found.")  # Exception is raised when the file is not found
     else:
-        raise Exception("Unsupported file format")
+        raise Exception("Unsupported file format") # Exception is raised when the file format is not one of the two supported.
     return data
 
 # Step 2: Data Validation
@@ -31,8 +32,10 @@ def validate_data(data):
         pd.DataFrame: The cleaned data.
     """
     if "Airline" in data.columns:  # Assuming a column identifies the dataset
+        print('--> Validating')
         return validate_airline_flights(data)
     elif "stock_symbol" in data.columns:
+        print('--> Validating')
         return validate_stock_prices(data)
     else:
         raise Exception("Unsupported dataset")
@@ -47,10 +50,13 @@ def validate_airline_flights(data):
     Returns:
         bool: True if data is valid, False otherwise.
     """
-    # Check for missing values
+    # Check numerical fields and convert where possible
+    data[['Revenue ($)', 'Distance (km)', 'Flight Number', 'Passengers (First Class)', 'Passengers (Business Class)', 'Passengers (Economy Class)']] = data[['Revenue ($)', 'Distance (km)', 'Flight Number', 'Passengers (First Class)', 'Passengers (Business Class)', 'Passengers (Economy Class)']].apply(pd.to_numeric, errors='coerce')
     airline_missing = data.isnull().sum()
-    # Count and remove NaN data
+    
+    # Count NaN data
     row_nan_count = data.isnull().any(axis=1).sum()
+    
     print('Total row count: ', len(data))
     print('Rows with missing data', row_nan_count)
     print('Missing values in airline data:\n', airline_missing)
@@ -68,9 +74,13 @@ def validate_stock_prices(data):
     Returns:
         bool: True if data is valid, False otherwise.
     """
+    # Validate numerical fields, converting other data types in those fields to NaN
+    data[['open', 'high', 'low', 'close', 'adj_close', 'volume']] = data[['open', 'high', 'low', 'close', 'adj_close', 'volume']].apply(pd.to_numeric, errors='coerce')
+
     # Check for missing values
     stock_missing = data.isnull().sum()
     row_nan_count = data.isnull().any(axis=1).sum()
+    
     print('Total row count: ', len(data))
     print('Rows with missing data', row_nan_count)
     print('Missing values in stock data:\n', stock_missing)
@@ -91,8 +101,10 @@ def clean_data(data):
         pd.DataFrame: The cleaned data.
     """
     if "Airline" in data.columns:  # Assuming a column identifies the dataset
+        print('--> Cleaning')
         return clean_airline_flights(data)
     elif "stock_symbol" in data.columns:
+        print('--> Cleaning')
         return clean_stock_prices(data)
     else:
         raise Exception("Unsupported dataset")
@@ -109,6 +121,7 @@ def clean_airline_flights(data):
         pd.DataFrame: The cleaned airline flights data.
     """
     clean_data = data.copy()
+    # Remove NaN data
     clean_data = clean_data.dropna()
     
     # Convert data types
@@ -136,7 +149,6 @@ def clean_stock_prices(data):
         pd.DataFrame: The cleaned stock prices data.
     """
     clean_data = data.copy()
-    clean_data = clean_data.dropna()
     # Handling Missing Values
     clean_data.fillna(method='ffill', inplace=True)  # Forward-fill to propagate last valid observation
 
@@ -157,7 +169,8 @@ def save_data(data, filepath):
       filepath (str): Path to the output file.
     """
     try:
-        data.to_csv(filepath, index=False)
+        data.to_csv(filepath, index=False) # Save data to CSV
+        print('--> Saving data')
     except:
         raise Exception("Cannot save data to CSV")
         
@@ -171,17 +184,16 @@ def data_processing_pipeline(filepath):
         filepath (str): Path to the data file.
             
     """
-    data = read_data(filepath)
-    validated_data = validate_data(data)
-    if validated_data:
-        cleaned_data = clean_data(data)
-        save_data(cleaned_data, "cleaned_" + filepath)
-        print(f"Saved data at cleaned_{filepath}")
+    data = read_data(filepath)    # Step 1: Read data
+    validated_data = validate_data(data) # Step 2: Validate data
+    if validated_data: 
+        cleaned_data = clean_data(data) # Step 3: Clean data
+        save_data(cleaned_data, "cleaned_" + filepath) # Step 4: Save data
+        print(f"--> Saved data at cleaned_{filepath}")
     else:
-        print(f"Data validation failed for {filepath}")
+        print(f"--> Data validation failed for {filepath}")
          
             
 #Execute the ETL for the two datasets
-
 data_processing_pipeline("big_tech_stock_prices.txt")
 data_processing_pipeline("airline_flights.csv")

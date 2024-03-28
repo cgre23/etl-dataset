@@ -31,6 +31,7 @@ The result is two files called `cleaned_airline_flights.csv` and `cleaned_big_te
 **Notes**
 
 * This coding exercise was completed under a time constraint. With more time, I would focus on adding more robust validation checks and additional cleaning steps informed by further data exploration.
+
 **Contact**
 
 If you have questions or feedback, feel free to reach out to me at chrisgre23@gmail.com
