@@ -1,5 +1,6 @@
 
 ## Data Processing Pipeline: ETL Exercise 
+Christian Grech
 
 This repository contains the Python script and datasets used for a coding exercise evaluating my data processing and ETL development skills.
 
