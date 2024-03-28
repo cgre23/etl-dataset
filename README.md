@@ -24,7 +24,7 @@ This repository contains the Python script and datasets used for a coding exerci
 3. **Place Datasets:** Place the `airline_flights.csv` and `big_tech_stock_prices.txt` files in the same directory as the Python script.  
 4. **Execute:** Run the script from the command line:
    ```bash
-   python data_processing_script.py  # Replace with your script's name
+   python etl.py  
     ```
 
 **Notes**
